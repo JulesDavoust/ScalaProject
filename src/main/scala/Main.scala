@@ -22,7 +22,7 @@ class DirectedGraph[T] extends Graph[T] {
     vertices += v1
     vertices += v2
     val updatedNeighbors = edges.getOrElse(v1, Set()) + v2
-    edges += v1 -> updatedNeighbors
+    edges += (v1 -> updatedNeighbors)
     this
   }
 
@@ -42,6 +42,6 @@ object Main extends App {
   graph.addEdge(1, 3)
   graph.addEdge(1, 1)
   graph.addEdge(2, 4)
-  
+  println(graph.getAllVertices)
   println(graph.getAllEdges)
 }
