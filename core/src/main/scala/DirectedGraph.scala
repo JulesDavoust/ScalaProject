@@ -1,24 +1,10 @@
-case class DirectedGraph[V, E](adjacencyList: Map[V, Map[V, E]]) extends Graph[V, E] {
-  def vertices: Set[V] = adjacencyList.keySet
+case class DirectedGraph[V](adjacencyList: Map[V, Map[V, Long]]) extends Graph[V, DirectedGraph[V]](adjacencyList) {
+  override protected def newGraph(adjacencyList: Map[V, Map[V, Long]]): DirectedGraph[V] = DirectedGraph(adjacencyList)
 
-  def edges: Set[(V, V, E)] = 
+  override def getAllEdges: Set[Tuple] =
     adjacencyList.flatMap { case (v, neighbors) => 
-      neighbors.map { case (n, e) => (v, n, e) } 
+      neighbors.map { case (n, e) => (v, n) } 
     }.toSet
 
-  def neighbors(vertex: V): Set[V] = 
-    adjacencyList.getOrElse(vertex, Map.empty).keySet
-
-  def addEdge(source: V, destination: V, edge: E): DirectedGraph[V, E] = {
-    val neighbors = adjacencyList.getOrElse(source, Map.empty)
-    val updatedNeighbors = neighbors + (destination -> edge)
-    DirectedGraph(adjacencyList + (source -> updatedNeighbors))
-  }
-
-  def removeEdge(source: V, destination: V): DirectedGraph[V, E] = {
-    val neighbors = adjacencyList.getOrElse(source, Map.empty)
-    val updatedNeighbors = neighbors - destination
-    DirectedGraph(adjacencyList + (source -> updatedNeighbors))
-  }
+  override def addEdge(source: V, destination: V, edge: Long = 1): DirectedGraph[V] = super.addEdge(source, destination)
 }
-
