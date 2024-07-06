@@ -1,7 +1,12 @@
+package mycore
+
 abstract class Graph[V, G <: Graph[V, G]] (adjacencyList: Map[V, Map[V, Long]]) {
   self: G =>
 
-  def getAllVertices: Set[V] = adjacencyList.keySet
+  //def getAllVertices: Set[V] = adjacencyList.keySet
+
+  def getAllVertices: Set[V] = 
+    adjacencyList.keySet ++ adjacencyList.values.flatMap(_.keySet)
 
   def getAllEdges: Set[(V, V, Long)] = 
     adjacencyList.flatMap { case (v, neighbors) => 
@@ -22,6 +27,8 @@ abstract class Graph[V, G <: Graph[V, G]] (adjacencyList: Map[V, Map[V, Long]]) 
     val updatedNeighbors = neighbors - destination
     newGraph(adjacencyList + (source -> updatedNeighbors))
   }
+
+  def getAdjacencyList: Map[V, Map[V, Long]] = adjacencyList
 
   protected def newGraph(adjacencyList: Map[V, Map[V, Long]]): G
 }
