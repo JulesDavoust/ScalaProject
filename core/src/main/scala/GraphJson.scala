@@ -17,12 +17,12 @@ trait GraphJsonSupport[V] {
     graphJson.toJson
   }
 
-  def fromJson(json: String)(implicit decoder: JsonDecoder[V]): Either[String, DirectedGraph[V]] = {
+  def fromJson(json: String)(implicit decoder: JsonDecoder[V]): Either[String, self.type] = {
     json.fromJson[GraphJson[V]].map { graphJson =>
       val adjacencyList = graphJson.edges.groupBy(_._1).map { case (v, edges) =>
         v -> edges.map(e => e._2 -> e._3).toMap
       }
-      DirectedGraph(adjacencyList)
+      newGraph(adjacencyList).asInstanceOf[self.type]
     }
   }
 }
