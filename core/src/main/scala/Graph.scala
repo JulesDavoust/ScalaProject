@@ -29,4 +29,21 @@ abstract class Graph[V, G <: Graph[V, G]] (adjacencyList: Map[V, Map[V, Long]]) 
     val (_, result) = dfsRecursive(start, Set(), Nil)
     result.reverse
   }
+
+  def breadthFirstSearch(start: V): List[V] = {
+    def bfs(queue: List[V], visited: Set[V], result: List[V]): List[V] = {
+      queue match {
+        case Nil => result.reverse
+        case node :: rest =>
+          if (visited.contains(node)) {
+            bfs(rest, visited, result)
+          } else {
+            val neighbors = this.getNeighbors(node)
+            bfs(rest ++ neighbors, visited + node, node :: result)
+          }
+      }
+    }
+
+    bfs(List(start), Set(), Nil)
+  }
 }
