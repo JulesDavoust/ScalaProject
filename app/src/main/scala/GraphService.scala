@@ -52,7 +52,39 @@ case class GraphService(ref: Ref[Map[String, DirectedGraph[String]]]) {
     json = new String(bytes.toArray, StandardCharsets.UTF_8)
     _ <- loadGraph(graphName, json).mapError(e => new IOException(e))
   } yield ()
+
+  def dfs(graphName: String, start: String): IO[String, List[String]] = for {
+    graphs <- ref.get
+    graph <- ZIO.fromOption(graphs.get(graphName)).orElseFail(s"Graph $graphName not found")
+  } yield graph.dfs(start)
+
+  def bfs(graphName: String, start: String): IO[String, List[String]] = for {
+    graphs <- ref.get
+    graph <- ZIO.fromOption(graphs.get(graphName)).orElseFail(s"Graph $graphName not found")
+  } yield graph.bfs(start)
+
+  def topologicalSort(graphName: String): IO[String, List[String]] = for {
+    graphs <- ref.get
+    graph <- ZIO.fromOption(graphs.get(graphName)).orElseFail(s"Graph $graphName not found")
+    sorted <- ZIO.fromEither(graph.topologicalSort)
+  } yield sorted
+
+  def hasCycle(graphName: String): IO[String, Boolean] = for {
+    graphs <- ref.get
+    graph <- ZIO.fromOption(graphs.get(graphName)).orElseFail(s"Graph $graphName not found")
+  } yield graph.hasCycle
+
+  def floydWarshall(graphName: String): IO[String, Map[(String, String), Long]] = for {
+    graphs <- ref.get
+    graph <- ZIO.fromOption(graphs.get(graphName)).orElseFail(s"Graph $graphName not found")
+  } yield graph.floydWarshall
+
+  def dijkstra(graphName: String, start: String): IO[String, Map[String, Long]] = for {
+    graphs <- ref.get
+    graph <- ZIO.fromOption(graphs.get(graphName)).orElseFail(s"Graph $graphName not found")
+  } yield graph.dijkstra(start)
 }
+
 
 object GraphService {
   def create: UIO[GraphService] =

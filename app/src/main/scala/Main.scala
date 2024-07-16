@@ -13,7 +13,13 @@ object Main extends ZIOAppDefault {
     _ <- Console.printLine("3. Display Graph")
     _ <- Console.printLine("4. Save Graph to File")
     _ <- Console.printLine("5. Load Graph from File")
-    _ <- Console.printLine("6. Exit")
+     _ <- Console.printLine("6. Depth First Search (DFS)")
+    _ <- Console.printLine("7. Breadth First Search (BFS)")
+    _ <- Console.printLine("8. Topological Sort")
+    _ <- Console.printLine("9. Cycle Detection")
+    _ <- Console.printLine("10. Floyd-Warshall Algorithm")
+    _ <- Console.printLine("11. Dijkstra's Algorithm")
+    _ <- Console.printLine("12. Exit")
   } yield ()
 
   def getInput(prompt: String): ZIO[Any, IOException, String] = for {
@@ -56,10 +62,49 @@ object Main extends ZIOAppDefault {
           filePath <- getInput("Enter file path: ")
           _ <- graphService.loadGraphFromFile(name, filePath).catchAll(e => Console.printLine(e))
         } yield ()
-      case "6" => ZIO.unit
+      case "6" =>
+        for {
+          name <- getInput("Enter graph name: ")
+          start <- getInput("Enter start vertex: ")
+          result <- graphService.dfs(name, start).catchAll(e => Console.printLine(e))
+          _ <- Console.printLine(s"DFS result: $result")
+        } yield ()
+      case "7" =>
+        for {
+          name <- getInput("Enter graph name: ")
+          start <- getInput("Enter start vertex: ")
+          result <- graphService.bfs(name, start).catchAll(e => Console.printLine(e))
+          _ <- Console.printLine(s"BFS result: $result")
+        } yield ()
+      case "8" =>
+        for {
+          name <- getInput("Enter graph name: ")
+          result <- graphService.topologicalSort(name).catchAll(e => Console.printLine(e))
+          _ <- Console.printLine(s"Topological Sort result: $result")
+        } yield ()
+      case "9" =>
+        for {
+          name <- getInput("Enter graph name: ")
+          result <- graphService.hasCycle(name).catchAll(e => Console.printLine(e))
+          _ <- Console.printLine(s"Cycle Detection result: $result")
+        } yield ()
+      case "10" =>
+        for {
+          name <- getInput("Enter graph name: ")
+          result <- graphService.floydWarshall(name).catchAll(e => Console.printLine(e))
+          _ <- Console.printLine(s"Floyd-Warshall result: $result")
+        } yield ()
+      case "11" =>
+        for {
+          name <- getInput("Enter graph name: ")
+          start <- getInput("Enter start vertex: ")
+          result <- graphService.dijkstra(name, start).catchAll(e => Console.printLine(e))
+          _ <- Console.printLine(s"Dijkstra's Algorithm result: $result")
+        } yield ()
+      case "12" => ZIO.unit
       case _ => Console.printLine("Invalid choice!")
     }
-    _ <- if (choice != "6") program(graphService) else ZIO.unit
+    _ <- if (choice != "12") program(graphService) else ZIO.unit
   } yield ()
 
   def initialLoad(graphService: GraphService): IO[IOException, Unit] = for {
