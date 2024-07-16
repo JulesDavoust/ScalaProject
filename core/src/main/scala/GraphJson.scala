@@ -9,20 +9,22 @@ object GraphJson {
   implicit def decoder[V: JsonDecoder]: JsonDecoder[GraphJson[V]] = DeriveJsonDecoder.gen[GraphJson[V]]
 }
 
-trait GraphJsonSupport[V] {
-  self: Graph[V, ?] =>
+trait GraphJsonSupport[V, G <: Graph[V, G]] {
+  self: G =>
 
   def toJson(implicit encoder: JsonEncoder[V]): String = {
     val graphJson = GraphJson(getAllVertices, getAllEdges)
     graphJson.toJson
   }
 
-  def fromJson(json: String)(implicit decoder: JsonDecoder[V]): Either[String, self.type] = {
+  def fromJson(json: String)(implicit decoder: JsonDecoder[V]): Either[String, G] = {
     json.fromJson[GraphJson[V]].map { graphJson =>
       val adjacencyList = graphJson.edges.groupBy(_._1).map { case (v, edges) =>
         v -> edges.map(e => e._2 -> e._3).toMap
       }
-      newGraph(adjacencyList).asInstanceOf[self.type]
+      newGraph(adjacencyList)
     }
   }
+
+  protected def newGraph(adjacencyList: Map[V, Map[V, Long]]): G
 }

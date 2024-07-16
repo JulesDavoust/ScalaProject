@@ -1,12 +1,18 @@
 package mycore
 
-trait GraphVizSupport[V] {
-  self: Graph[V, ?] =>
+trait GraphVizSupport[V, G <: Graph[V, G]] {
+  self: G =>
 
   def toGraphViz: String = {
-    val graphType = if (this.isInstanceOf[DirectedGraph[?]]) "digraph" else "graph"
-    val edgeOp = if (this.isInstanceOf[DirectedGraph[?]]) " -> " else " -- "
-    
+    val graphType = self match {
+      case _: DirectedGraph[_] => "digraph"
+      case _: UndirectedGraph[_] => "graph"
+    }
+    val edgeOp = self match {
+      case _: DirectedGraph[_] => " -> "
+      case _: UndirectedGraph[_] => " -- "
+    }
+
     val builder = new StringBuilder
     builder.append(s"$graphType G {\n")
     
@@ -20,3 +26,4 @@ trait GraphVizSupport[V] {
     builder.toString()
   }
 }
+

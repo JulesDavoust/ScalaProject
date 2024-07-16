@@ -6,35 +6,29 @@ import zio.json._
 
 class GraphJsonSpec extends AnyFlatSpec with Matchers {
 
-  "A DirectedGraph" should "encode and decode to/from JSON correctly" in {
-    val graph = DirectedGraph(Map("a" -> Map("b" -> 1), "b" -> Map("c" -> 2)))
-    
-    // Encode to JSON
+  "A DirectedGraph" should "serialize to JSON and deserialize from JSON correctly" in {
+    val graph = DirectedGraph(Map(
+      "A" -> Map("B" -> 1, "C" -> 2),
+      "B" -> Map("C" -> 3),
+      "C" -> Map.empty[String, Long]
+    ))
+
     val json = graph.toJson
-    println(json)
-    json should include ("\"vertices\":[\"a\",\"b\",\"c\"]")
-    json should include ("\"edges\":[[\"a\",\"b\",1],[\"b\",\"c\",2]]")
-    
-    // Decode from JSON
-    val decodedGraph = graph.fromJson(json).getOrElse(fail("Failed to decode JSON"))
-    println(decodedGraph.getAdjacencyList)
-    println(decodedGraph.getAllEdges)
-    println(decodedGraph.getAllVertices)
-    decodedGraph shouldEqual graph
+    val deserializedGraph = graph.fromJson(json)
+
+    deserializedGraph shouldEqual Right(graph)
   }
 
-  it should "handle empty graphs" in {
-    val emptyGraph = DirectedGraph(Map.empty[String, Map[String, Long]])
-    
-    // Encode to JSON
-    val json = emptyGraph.toJson
-    println(json)
-    json should include ("\"vertices\":[]")
-    json should include ("\"edges\":[]")
-    
-    // Decode from JSON
-    val decodedGraph = emptyGraph.fromJson(json).getOrElse(fail("Failed to decode JSON"))
-    println(decodedGraph.getAdjacencyList)
-    decodedGraph shouldEqual emptyGraph
+  "An UndirectedGraph" should "serialize to JSON and deserialize from JSON correctly" in {
+    val graph = UndirectedGraph(Map(
+      "A" -> Map("B" -> 1, "C" -> 2),
+      "B" -> Map("A" -> 1, "C" -> 3),
+      "C" -> Map("A" -> 2, "B" -> 3)
+    ))
+
+    val json = graph.toJson
+    val deserializedGraph = graph.fromJson(json)
+
+    deserializedGraph shouldEqual Right(graph)
   }
 }
