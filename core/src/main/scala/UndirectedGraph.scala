@@ -5,6 +5,8 @@ case class UndirectedGraph[V](adjacencyList: Map[V, Map[V, Long]])
   with GraphJsonSupport[V, UndirectedGraph[V]]
   with GraphVizSupport[V, UndirectedGraph[V]] {
   
+  override implicit val isDirected: Boolean = false
+
   override def getAllEdges: Set[(V, V, Long)] = 
     adjacencyList.flatMap { case (v, neighbors) => 
       neighbors.collect { case (dest, weight) if v.hashCode <= dest.hashCode => (v, dest, weight) }

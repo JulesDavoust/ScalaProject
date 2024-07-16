@@ -12,6 +12,8 @@ object GraphJson {
 trait GraphJsonSupport[V, G <: Graph[V, G]] {
   self: G =>
 
+  implicit val isDirected: Boolean
+
   def toJson(implicit encoder: JsonEncoder[V]): String = {
     val graphJson = GraphJson(getAllVertices, getAllEdges)
     graphJson.toJson
@@ -19,12 +21,18 @@ trait GraphJsonSupport[V, G <: Graph[V, G]] {
 
   def fromJson(json: String)(implicit decoder: JsonDecoder[V]): Either[String, G] = {
     json.fromJson[GraphJson[V]].map { graphJson =>
-      val adjacencyList = graphJson.edges.groupBy(_._1).map { case (v, edges) =>
-        v -> edges.map(e => e._2 -> e._3).toMap
+      val initialAdjacencyList = graphJson.vertices.map(v => v -> Map.empty[V, Long]).toMap
+      val adjacencyList = graphJson.edges.foldLeft(initialAdjacencyList) { case (acc, (source, dest, weight)) =>
+        val updatedSourceNeighbors = acc(source) + (dest -> weight)
+        val updatedAdjacencyList = acc + (source -> updatedSourceNeighbors)
+        if (!isDirected) {
+          val updatedDestNeighbors = updatedAdjacencyList(dest) + (source -> weight)
+          updatedAdjacencyList + (dest -> updatedDestNeighbors)
+        } else {
+          updatedAdjacencyList
+        }
       }
       newGraph(adjacencyList)
     }
   }
-
-  protected def newGraph(adjacencyList: Map[V, Map[V, Long]]): G
 }

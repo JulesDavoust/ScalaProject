@@ -1,6 +1,6 @@
 package mycore
 
-abstract class Graph[V, G <: Graph[V, G]] (adjacencyList: Map[V, Map[V, Long]]) {
+abstract class Graph[V, G <: Graph[V, G]](adjacencyList: Map[V, Map[V, Long]]) {
   self: G =>
 
   def getAllVertices: Set[V] = 
@@ -21,7 +21,7 @@ abstract class Graph[V, G <: Graph[V, G]] (adjacencyList: Map[V, Map[V, Long]]) 
     result.reverse
   }
 
-  def dfsRecursive(node: V, visited: Set[V], result: List[V]): (Set[V], List[V]) = {
+  private def dfsRecursive(node: V, visited: Set[V], result: List[V]): (Set[V], List[V]) = {
     if (visited.contains(node)) (visited, result)
     else {
       val neighbors = this.getNeighbors(node)
@@ -65,7 +65,7 @@ abstract class Graph[V, G <: Graph[V, G]] (adjacencyList: Map[V, Map[V, Long]]) 
     val initialDistances: Map[V, Map[V, Long]] = vertices.foldLeft(Map.empty[V, Map[V, Long]]) { (acc, v) =>
       val row = vertices.foldLeft(Map.empty[V, Long]) { (rowAcc, w) =>
         if (v == w) rowAcc + (w -> 0L)
-        else adjacencyList(v).get(w).map(weight => rowAcc + (w -> weight)).getOrElse(rowAcc + (w -> Long.MaxValue))
+        else adjacencyList.getOrElse(v, Map.empty).get(w).map(weight => rowAcc + (w -> weight)).getOrElse(rowAcc + (w -> Long.MaxValue))
       }
       acc + (v -> row)
     }
@@ -86,4 +86,6 @@ abstract class Graph[V, G <: Graph[V, G]] (adjacencyList: Map[V, Map[V, Long]]) 
 
     updatedDistances
   }
+
+  protected def newGraph(adjacencyList: Map[V, Map[V, Long]]): G
 }

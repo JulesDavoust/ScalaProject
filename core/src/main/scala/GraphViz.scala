@@ -3,7 +3,7 @@ package mycore
 trait GraphVizSupport[V, G <: Graph[V, G]] {
   self: G =>
 
-  def toGraphViz: String = {
+  def toGraphViz(implicit ordering: Ordering[V]): String = {
     val graphType = self match {
       case _: DirectedGraph[_] => "digraph"
       case _: UndirectedGraph[_] => "graph"
@@ -16,8 +16,8 @@ trait GraphVizSupport[V, G <: Graph[V, G]] {
     val builder = new StringBuilder
     builder.append(s"$graphType G {\n")
     
-    for ((source, neighbors) <- getAdjacencyList) {
-      for ((dest, weight) <- neighbors) {
+    for ((source, neighbors) <- getAdjacencyList.toSeq.sortBy(_._1)) {
+      for ((dest, weight) <- neighbors.toSeq.sortBy(_._1)) {
         builder.append(s"""  "$source"$edgeOp"$dest" [weight="$weight"];\n""")
       }
     }
@@ -26,4 +26,3 @@ trait GraphVizSupport[V, G <: Graph[V, G]] {
     builder.toString()
   }
 }
-

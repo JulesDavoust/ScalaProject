@@ -5,6 +5,8 @@ case class DirectedGraph[V](adjacencyList: Map[V, Map[V, Long]])
   with GraphJsonSupport[V, DirectedGraph[V]]
   with GraphVizSupport[V, DirectedGraph[V]] {
   
+  override implicit val isDirected: Boolean = true
+
   override def getAllEdges: Set[(V, V, Long)] = 
     adjacencyList.flatMap { case (v, neighbors) => 
       neighbors.map { case (n, e) => (v, n, e) } 

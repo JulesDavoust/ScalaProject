@@ -1,46 +1,36 @@
-package mycore
-
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import mycore._
 
-class GraphVizSpec extends AnyFlatSpec with Matchers {
+class GraphVizSupportSpec extends AnyFlatSpec with Matchers {
+  implicit val intOrdering: Ordering[Int] = Ordering.Int
 
-  "A DirectedGraph" should "generate correct GraphViz representation" in {
-    val graph = DirectedGraph(Map(
-      "A" -> Map("B" -> 1, "C" -> 2),
-      "B" -> Map("C" -> 3),
-      "C" -> Map.empty[String, Long]
-    ))
-
-    val expectedGraphViz = 
+  "GraphVizSupport" should "convert DirectedGraph to GraphViz format correctly" in {
+    val graph = DirectedGraph(Map(1 -> Map(2 -> 1L, 3 -> 2L), 2 -> Map(3 -> 3L), 3 -> Map.empty[Int, Long]))
+    val graphViz = graph.toGraphViz.trim.replaceAll("\\s+", " ")
+    val expected = 
       """digraph G {
-        |  "A" -> "B" [weight="1"];
-        |  "A" -> "C" [weight="2"];
-        |  "B" -> "C" [weight="3"];
+        |  "1" -> "2" [weight="1"];
+        |  "1" -> "3" [weight="2"];
+        |  "2" -> "3" [weight="3"];
         |}
-        |""".stripMargin.trim
+        |""".stripMargin.trim.replaceAll("\\s+", " ")
 
-    graph.toGraphViz.trim shouldEqual expectedGraphViz
+    graphViz shouldBe expected
   }
 
-  "An UndirectedGraph" should "generate correct GraphViz representation" in {
-    val graph = UndirectedGraph(Map(
-      "A" -> Map("B" -> 1, "C" -> 2),
-      "B" -> Map("A" -> 1, "C" -> 3),
-      "C" -> Map("A" -> 2, "B" -> 3)
-    ))
-
-    val expectedGraphViz = 
+  it should "convert UndirectedGraph to GraphViz format correctly" in {
+    val graph = UndirectedGraph(Map(1 -> Map(2 -> 1L), 2 -> Map(1 -> 1L, 3 -> 2L), 3 -> Map(2 -> 2L)))
+    val graphViz = graph.toGraphViz.trim.replaceAll("\\s+", " ")
+    val expected = 
       """graph G {
-        |  "A" -- "B" [weight="1"];
-        |  "A" -- "C" [weight="2"];
-        |  "B" -- "A" [weight="1"];
-        |  "B" -- "C" [weight="3"];
-        |  "C" -- "A" [weight="2"];
-        |  "C" -- "B" [weight="3"];
+        |  "1" -- "2" [weight="1"];
+        |  "2" -- "1" [weight="1"];
+        |  "2" -- "3" [weight="2"];
+        |  "3" -- "2" [weight="2"];
         |}
-        |""".stripMargin.trim
+        |""".stripMargin.trim.replaceAll("\\s+", " ")
 
-    graph.toGraphViz.trim shouldEqual expectedGraphViz
+    graphViz shouldBe expected
   }
 }
