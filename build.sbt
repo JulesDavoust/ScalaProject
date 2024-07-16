@@ -17,11 +17,11 @@ lazy val core = (project in file("core"))
   .settings(
     name := "core",
     scalaVersion := scala3Version,
-    // libraryDependencies ++= Seq(
+    libraryDependencies ++= Seq(
     //   "dev.zio" %% "zio" % "2.0.5",
     //   "dev.zio" %% "zio-json" % "0.3.0-RC10",
-    //   "org.scalatest" %% "scalatest" % "3.2.10" % Test
-    // ),
+      "org.scalatest" %% "scalatest" % "3.2.10" % Test
+    )
     // Compile / mainClass := Some("graph.Main")
   )
 
