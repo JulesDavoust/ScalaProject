@@ -11,5 +11,7 @@ package mycore
     .addEdge("D", "F", 1)
     .addEdge("F", "D", 1)
   
-  println("GraphViz Representation:\n" + graphWithEdge.toGraphViz)
+  println(graphWithEdge.getAllEdges)
+  println(graphWithEdge.floydWarshall.get("A"))
+  println(graphWithEdge.dijkstra("A"))
 }

@@ -1,5 +1,7 @@
 package mycore
 
+import scala.collection.immutable.SortedMap
+
 abstract class Graph[V, G <: Graph[V, G]](adjacencyList: Map[V, Map[V, Long]]) {
   self: G =>
 
@@ -59,6 +61,8 @@ abstract class Graph[V, G <: Graph[V, G]](adjacencyList: Map[V, Map[V, Long]]) {
     sortedStack.reverse
   }
 
+  // TODO - Cycle detection
+
   def floydWarshall: Map[V, Map[V, Long]] = {
     val vertices = getAllVertices
 
@@ -85,6 +89,40 @@ abstract class Graph[V, G <: Graph[V, G]](adjacencyList: Map[V, Map[V, Long]]) {
     }
 
     updatedDistances
+  }
+
+  def dijkstra (start: V): Map[V, Long] = {
+    val initialDistances: Map[V, Long] = getAllVertices.map(_ -> Long.MaxValue).toMap + (start -> 0L)
+    val initialQueue: SortedMap[Long, Set[V]] = SortedMap(0L -> Set(start))
+    
+    def loop(distances: Map[V, Long], queue: SortedMap[Long, Set[V]]): Map[V, Long] = {
+      if (queue.isEmpty) distances
+      else {
+        val (currentDist, nodes) = queue.head
+        val current = nodes.head
+        val remainingNodes = nodes - current
+        val updatedQueue = if (remainingNodes.isEmpty) queue.tail else queue.updated(currentDist, remainingNodes)
+        
+        val (newDistances, newQueue) = adjacencyList.getOrElse(current, Map.empty).foldLeft((distances, updatedQueue)) {
+          case ((distAcc, queueAcc), (neighbor, weight)) =>
+            val newDist = currentDist + weight
+            if (newDist < distAcc(neighbor)) {
+              val updatedDistances = distAcc.updated(neighbor, newDist)
+              val updatedQueueAcc = queueAcc.get(newDist) match {
+                case Some(nodes) => queueAcc.updated(newDist, nodes + neighbor)
+                case None => queueAcc + (newDist -> Set(neighbor))
+              }
+              (updatedDistances, updatedQueueAcc)
+            } else {
+              (distAcc, queueAcc)
+            }
+        }
+        
+        loop(newDistances, newQueue)
+      }
+    }
+    
+    loop(initialDistances, initialQueue)
   }
 
   protected def newGraph(adjacencyList: Map[V, Map[V, Long]]): G
