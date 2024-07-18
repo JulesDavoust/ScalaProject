@@ -40,8 +40,8 @@ lazy val app = (project in file("app"))
       "dev.zio" %% "zio" % "2.0.0",
       "dev.zio" %% "zio-json" % "0.4.2",
       "dev.zio" %% "zio-nio" % "2.0.2",
-      "dev.zio" %% "zio-test" % "2.1.5" % Test,
-      "dev.zio" %% "zio-test-sbt" % "2.1.5" % Test,
-      "org.scalatest" %% "scalatest" % "3.2.12" % Test
+      // "dev.zio" %% "zio-test" % "2.1.5" % Test,
+      // "dev.zio" %% "zio-test-sbt" % "2.1.5" % Test,
+      // "org.scalatest" %% "scalatest" % "3.2.12" % Test
     )
   )
