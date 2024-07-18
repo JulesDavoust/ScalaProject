@@ -15,13 +15,13 @@ case class UndirectedGraph[V](adjacencyList: Map[V, Map[V, Long]])
   override def addEdge(source: V, destination: V, edge: Long = 1): UndirectedGraph[V] = {
     val updatedNeighborsSource = adjacencyList.getOrElse(source, Map.empty) + (destination -> edge)
     val updatedNeighborsDestination = adjacencyList.getOrElse(destination, Map.empty) + (source -> edge)
-    UndirectedGraph(adjacencyList + (source -> updatedNeighborsSource) + (destination -> updatedNeighborsDestination))
+    newGraph(adjacencyList + (source -> updatedNeighborsSource) + (destination -> updatedNeighborsDestination))
   }
 
   override def removeEdge(source: V, destination: V): UndirectedGraph[V] = {
     val updatedNeighborsSource = adjacencyList.getOrElse(source, Map.empty) - destination
     val updatedNeighborsDestination = adjacencyList.getOrElse(destination, Map.empty) - source
-    UndirectedGraph(adjacencyList + (source -> updatedNeighborsSource) + (destination -> updatedNeighborsDestination))
+    newGraph(adjacencyList + (source -> updatedNeighborsSource) + (destination -> updatedNeighborsDestination))
   }
 
   override protected def newGraph(adjacencyList: Map[V, Map[V, Long]]): UndirectedGraph[V] = UndirectedGraph(adjacencyList)

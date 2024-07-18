@@ -12,5 +12,5 @@ package mycore
     .addEdge("F", "D", 1)
   
   println(graphWithEdge.getAllEdges)
-  println(graphWithEdge.hasCycle)
+  println(GraphAlgorithms.hasCycle(graphWithEdge))
 }
