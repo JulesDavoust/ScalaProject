@@ -12,6 +12,5 @@ package mycore
     .addEdge("F", "D", 1)
   
   println(graphWithEdge.getAllEdges)
-  println(graphWithEdge.floydWarshall.get("A"))
-  println(graphWithEdge.dijkstra("A"))
+  println(graphWithEdge.hasCycle)
 }

@@ -61,7 +61,20 @@ abstract class Graph[V, G <: Graph[V, G]](adjacencyList: Map[V, Map[V, Long]]) {
     sortedStack.reverse
   }
 
-  // TODO - Cycle detection
+  def hasCycle: Boolean = {
+    def dfs(node: V, visited: Set[V], parent: Option[V]): Boolean = {
+      if (visited.contains(node)) true
+      else {
+        val newVisited = visited + node
+        getNeighbors(node).exists { neighbor =>
+          if (Some(neighbor) != parent) dfs(neighbor, newVisited, Some(node))
+          else false
+        }
+      }
+    }
+
+    getAllVertices.exists(node => dfs(node, Set.empty, None))
+  }
 
   def floydWarshall: Map[V, Map[V, Long]] = {
     val vertices = getAllVertices
@@ -124,6 +137,8 @@ abstract class Graph[V, G <: Graph[V, G]](adjacencyList: Map[V, Map[V, Long]]) {
     
     loop(initialDistances, initialQueue)
   }
+
+  // TODO - Add tailrec annotation
 
   protected def newGraph(adjacencyList: Map[V, Map[V, Long]]): G
 }
