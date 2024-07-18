@@ -1,6 +1,7 @@
 package mycore
 
 import scala.collection.immutable.SortedMap
+import scala.annotation.tailrec
 
 object GraphAlgorithms {
   def depthFirstSearch[V, G <: Graph[V, G]](graph: G, start: V): List[V] = {
@@ -20,6 +21,7 @@ object GraphAlgorithms {
   }
 
   def breadthFirstSearch[V, G <: Graph[V, G]](graph: G, start: V): List[V] = {
+    @tailrec
     def bfs(queue: List[V], visited: Set[V], result: List[V]): List[V] = {
       queue match {
         case Nil => result.reverse
@@ -93,6 +95,7 @@ object GraphAlgorithms {
     val initialDistances: Map[V, Long] = graph.getAllVertices.map(_ -> Long.MaxValue).toMap + (start -> 0L)
     val initialQueue: SortedMap[Long, Set[V]] = SortedMap(0L -> Set(start))
     
+    @tailrec
     def loop(distances: Map[V, Long], queue: SortedMap[Long, Set[V]]): Map[V, Long] = {
       if (queue.isEmpty) distances
       else {
@@ -122,6 +125,4 @@ object GraphAlgorithms {
     
     loop(initialDistances, initialQueue)
   }
-
-  // TODO - Add tailrec annotation
 }
