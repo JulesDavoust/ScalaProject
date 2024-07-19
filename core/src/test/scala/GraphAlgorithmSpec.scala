@@ -101,6 +101,7 @@ class GraphAlgorithmSpec extends AnyFlatSpec with Matchers {
                                                                                "D" -> 0))
   }
   
+  // Don't need to test for all the values again since already tested for Floyd's algorithm we can therfore just reuse its value
   it should "found the same shortest path with Dijkstra's algorithm and the Floyd's one" in {
     GraphAlgorithms.dijkstra(graphTestDirected, "A") shouldBe GraphAlgorithms.floydWarshall(graphTestDirected)
                                                                              .getOrElse("A", Map.empty)

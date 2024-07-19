@@ -7,6 +7,18 @@ Note: The current implementation of the application is designed specifically for
 
 ### Components Presentation
 
+**Graph.scala :**
+
+The [`Graph.scala`](/core/src/main/scala/Graph.scala) file provides the basic functions of a graph and its data in the for of an adjacency matrix. It allows to generalize graphs.
+
+**DirectedGraph.scala :**
+
+The [`DirectedGraph.scala`](/core/src/main/scala/DirectedGraph.scala) file provides the implementation of the graph's modification functions for directed graphs.
+
+**UndirectedGraph.scala :**
+
+The [`UndirectedGraph.scala`](/core/src/main/scala/UndirectedGraph.scala) file provides the implementation of the graph's modification functions for undirected graphs.
+
 **GraphJson.scala :**
 
 The [`GraphJson.scala`](/core/src/main/scala/GraphJson.scala) file provides the functionality to serialize and deserialize graphs to and from JSON. This allows for easy storage and retrieval of graph data, for both types of graph.
@@ -46,6 +58,11 @@ sbt core/test
 ```
 
 ## Design Decision
+The design of our data structure is focused on the fact that we wanted to **reduce the memory cost** of a graph since, due to **immutability**, we have to create instances multiple times across the program’s execution. Therefore we decided to represent a graph in an abstract class that will asked to produce all the gets, add and remove functions (and already implement some that are really generic).
+
+To represent the graph’s data themselves we decided to use the **adjacency list** way. Indeed this way we are able to store the edges in a ***Map[Vertex, Map[Vertex, Long]]*** so that each edge will be associated to **a map that store all its neighbours each one associated to the edge weight** to the vertex. We chose that way rather than the adjacency matrix due to the fact that **a matrix one would also store data for the not existing edges** and we also chose the list over the matrix because it is **easier to apply the algorithms on it** and easily **transformable into the matrix** version if need (the reverse operation would have a far much higher memory cost due to some useless loop iterations).
+
+Then we created **two other classes that extends our *Graph* class** that will represent the directed and undirected graph. Those classes are the ones that will implement the abstract class’s functions since for example to add and remove edge the operation isn’t the same on the two graphs. Those class needs the declaration of type so that the user can chose **which ever type he wants for the vertices**. We decided to add only two other classes since we made them both weighted and if the user wants them non-weighted he just have to not give a weight (will be put at one by default) and the operations will work as if it was a weighted graph. Finally we created **a Scala object** that will **contain all the graph’s algorithm functions**.
 
 The design of the ZIO application is centered around the use of ZIO's Ref to manage state immutably. This ensures safe concurrent updates to the graph data, leveraging ZIO's effect system to handle errors and side effects through a clean API provided by GraphService. Ref offers several advantages: it guarantees immutability by returning a new state with each update without modifying the old state, simplifies reasoning and verification of the code, and prevents race conditions with atomic operations, ensuring secure state management in concurrent environments.
 
@@ -175,6 +192,28 @@ sbt core/test
 **Overview of the test coverage**
 
 The test coverage includes:
+
+**GraphAlgorithmSpec.scala :**
+
+The [`GraphAlgorithmSpec.scala`](/core/src/test/scala/GraphAlgorithmSpec.scala) tests the basic function of the graphs (add and remove edges) but also each and everyone graphs algorithms.
+
+Here is the output if the tests are correct :
+```console
+[info] GraphAlgorithmSpec:
+[info] Directed graph modifications
+[info] - should add edge correctly
+[info] - should remove edge correctly
+[info] Undirected graph modifications
+[info] - should add edge correctly
+[info] - should remove edge correctly
+[info] Graph's algorithms
+[info] - should perform depth first search correctly
+[info] - should perform breadth first search correctly
+[info] - should perform topological sort correctly
+[info] - should perform cycle detection correctly
+[info] - should found the shortest path with Floyd algorithm
+[info] - should found the same shortest path with Dijkstra's algorithm and the Floyd's one
+```
 
 **GraphJsonSupportSpec.scala :**
 

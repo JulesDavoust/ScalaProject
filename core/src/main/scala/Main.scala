@@ -1,16 +1,12 @@
 package mycore
 
 @main def undirectedGraphVizExample(): Unit = {
-  val graph = UndirectedGraph[String](Map.empty)
-  val graphWithEdge = graph
-    .addEdge("A", "B", 1)
-    .addEdge("A", "C", 1)
-    .addEdge("B", "C", 10)
-    .addEdge("B", "E", 1)
-    .addEdge("C", "D", 1)
-    .addEdge("D", "F", 1)
-    .addEdge("F", "D", 1)
+  val graph = DirectedGraph[String](Map.empty)
+  val graphWithEdge = UndirectedGraph[String](Map("E" -> Map("B" -> 1), "F" -> Map("D" -> 1),
+                                                        "A" -> Map("B" -> 1, "C" -> 1),
+                                                        "B" -> Map("A" -> 1, "C" -> 10, "E" -> 1),
+                                                        "C" -> Map("A" -> 1, "B" -> 10, "D" -> 1),
+                                                        "D" -> Map("C" -> 1, "F" -> 1)))
   
-  println(graphWithEdge.getAllEdges)
-  println(GraphAlgorithms.hasCycle(graphWithEdge))
+  println(GraphAlgorithms.floydWarshall(graphWithEdge).get("A"))
 }
