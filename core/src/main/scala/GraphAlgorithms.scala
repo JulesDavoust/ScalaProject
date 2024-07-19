@@ -1,22 +1,23 @@
 package mycore
 
 import scala.collection.immutable.SortedMap
+import scala.collection.immutable.SortedSet
 import scala.annotation.tailrec
 
 object GraphAlgorithms {
   def depthFirstSearch[V, G <: Graph[V, G]](graph: G, start: V): List[V] = {
     val (_, result) = dfsRecursive(graph, start, Set(), Nil)
-    result.reverse
+    result
   }
 
   private def dfsRecursive[V, G <: Graph[V, G]](graph: G, node: V, visited: Set[V], result: List[V]): (Set[V], List[V]) = {
     if (visited.contains(node)) (visited, result)
     else {
       val neighbors = graph.getNeighbors(node)
-      val (newVisited, newResult) = neighbors.foldLeft((visited + node, node :: result)) {
+      val (newVisited, newResult) = neighbors.foldLeft((visited + node, result)) {
         case ((vis, res), neighbor) => dfsRecursive(graph, neighbor, vis, res)
       }
-      (newVisited, newResult)
+      (newVisited, node :: newResult)
     }
   }
 
@@ -45,7 +46,7 @@ object GraphAlgorithms {
         val (newVisited, newStack) = dfsRecursive(graph, node, visited, stack)
         (newVisited, newStack)
     }
-    sortedStack.reverse
+    sortedStack
   }
 
   def hasCycle[V, G <: Graph[V, G]] (graph: G): Boolean = {
